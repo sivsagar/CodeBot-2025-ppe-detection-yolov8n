@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PPE Detection Dashboard</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #D2C1B6;
+      margin: 0;
+      padding: 0;
+      color: #000000;
+    }
+
+    header {
+      background-color: #4f6c94;
+      color: #d2c6c6;
+      padding: 25px 0;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 30px;
+      letter-spacing: 1px;
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 10px;
+    }
+
+    #video-stream {
+      width: 90%;
+      max-width: 720px;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+      border: 6px solid #1d3557;
+    }
+
+    .dashboard-row {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      flex-wrap: wrap;
+      margin-top: 40px;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .stats, .cam-stats {
+      background-color: #456882;
+      padding: 25px 40px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      flex: 1 1 300px;
+    }
+
+    .stats p, .cam-stats p {
+      margin: 15px 0;
+      font-size: 20px;
+    }
+
+    .highlight {
+      font-weight: bold;
+      color: #eaeff2;
+    }
+
+    footer {
+      margin-top: 50px;
+      padding: 20px;
+      text-align: center;
+      background-color: #f1f3f5;
+      color: #555;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>PPE Detection Monitoring Dashboard</h1>
+  </header>
+
+  <main>
+    <img src="/video_feed" id="video-stream" alt="Live Video Stream">
+
+    <div class="dashboard-row">
+      <div class="stats">
+        <p>Total People Detected: <span class="highlight" id="total-people">0</span></p>
+        <p>PPE Worn: <span class="highlight" id="ppe-on">0</span></p>
+        <p>PPE Missing: <span class="highlight" id="ppe-off">0</span></p>
+      </div>
+
+      <div class="cam-stats">
+        <p>Resolution: <span class="highlight">640 × 480</span></p>
+        <p>FPS: <span class="highlight" id="fps">0</span></p>
+        <p>Status: <span class="highlight" id="cam-status">Checking...</span></p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    &copy; 2025 Smart PPE Detection System | Developed with Hardwork 📡
+  </footer>
+
+  <script>
+    setInterval(() => {
+      fetch('/ppe-data')
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('ppe-on').textContent = data.ppe_on;
+          document.getElementById('ppe-off').textContent = data.ppe_off;
+          document.getElementById('total-people').textContent = data.ppe_on + data.ppe_off;
+        });
+    }, 1000);
+
+    let lastTime = performance.now();
+    function updateFPS() {
+      const now = performance.now();
+      const fps = Math.round(1000 / (now - lastTime));
+      lastTime = now;
+      document.getElementById('fps').textContent = fps;
+      requestAnimationFrame(updateFPS);
+    }
+    requestAnimationFrame(updateFPS);
+
+    setInterval(() => {
+      fetch("/video_feed", { method: 'HEAD' })
+        .then(() => document.getElementById("cam-status").textContent = "Active")
+        .catch(() => document.getElementById("cam-status").textContent = "Disconnected");
+    }, 3000);
+  </script>
+
+</body>
+</html>
