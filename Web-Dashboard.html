@@ -49,7 +49,7 @@
       flex-wrap: wrap;
       margin-top: 40px;
       width: 100%;
-      max-width: 900px;
+      max-width: 1000px;
     }
 
     .stats, .cam-stats {
@@ -95,6 +95,8 @@
         <p>Total People Detected: <span class="highlight" id="total-people">0</span></p>
         <p>PPE Worn: <span class="highlight" id="ppe-on">0</span></p>
         <p>PPE Missing: <span class="highlight" id="ppe-off">0</span></p>
+        <p>Latitude: <span class="highlight" id="lat">--</span></p>
+        <p>Longitude: <span class="highlight" id="lon">--</span></p>
       </div>
 
       <div class="cam-stats">
@@ -106,17 +108,19 @@
   </main>
 
   <footer>
-    &copy; 2025 Smart PPE Detection System | Developed with Hardwork 📡
+    &copy; 2025 Smart PPE Detection System | Developed with Hard Work
   </footer>
 
   <script>
     setInterval(() => {
-      fetch('/ppe-data')
+      fetch('/ppe-stats')
         .then(response => response.json())
         .then(data => {
           document.getElementById('ppe-on').textContent = data.ppe_on;
           document.getElementById('ppe-off').textContent = data.ppe_off;
           document.getElementById('total-people').textContent = data.ppe_on + data.ppe_off;
+          document.getElementById('lat').textContent = data.lat || '--';
+          document.getElementById('lon').textContent = data.lon || '--';
         });
     }, 1000);
 
